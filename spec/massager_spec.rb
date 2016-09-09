@@ -45,13 +45,14 @@ describe Massager do
     expect {WithTypes.build({"bar" => 123})}.to raise_error(Dry::Types::ConstraintError)
   end
 
-  it "callable setter" do
+  it "does the typechecking after the block has been executed" do
     CallableSetter = Class.new do
       include Massager
       column :foo, "bar", type: Types::Strict::String do |v|
-        v.upcase
+        v.to_s
       end
     end
-    testable = CallableSetter.build({"bar" => "VALUE"})
+    testable = CallableSetter.build({"bar" => 123})
+    expect(testable.foo).to eq("123")
   end
 end
