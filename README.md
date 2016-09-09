@@ -45,7 +45,7 @@ testable.foo #=> "value"
 ExampleClass.build({"bar" => 123})
 testable.foo #=> raises Dry::Types::ConstraintError
 ```
-You can add bit of postprocessing via block:
+You can add bit of preprocessing via block (The type check will be preformed afer the block is executed):
 ```ruby
 class ExampleClass
   include Massager
