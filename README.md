@@ -39,7 +39,7 @@ class ExampleClass
 end
 ```
 It will raise an error if the type is not correct:
-```
+```ruby
 ExampleClass.build({"bar" => "value"})
 testable.foo #=> "value"
 ExampleClass.build({"bar" => 123})
@@ -55,7 +55,7 @@ class ExampleClass
 end
 ```
 And it will have following result
-```
+```ruby
 ExampleClass.build({"bar" => "value"})
 testable.foo #=> "VALUE"
 ```
