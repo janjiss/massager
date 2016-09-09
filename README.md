@@ -28,7 +28,7 @@ end
 ```
 In this scenario, the "bar" key's value will become the result `foo` method
 ```ruby
-ExampleClass.build({"bar" => "value"})
+testable = ExampleClass.build({"bar" => "value"})
 testable.foo #=> "value"
 ```
 You can also pass type checks using dry-types library:
@@ -40,9 +40,9 @@ end
 ```
 It will raise an error if the type is not correct:
 ```ruby
-ExampleClass.build({"bar" => "value"})
+testable = ExampleClass.build({"bar" => "value"})
 testable.foo #=> "value"
-ExampleClass.build({"bar" => 123})
+testable = ExampleClass.build({"bar" => 123})
 testable.foo #=> raises Dry::Types::ConstraintError
 ```
 You can add bit of preprocessing via block (The type check will be preformed afer the block is executed):
@@ -56,7 +56,7 @@ end
 ```
 And it will have following result
 ```ruby
-ExampleClass.build({"bar" => "value"})
+testable = ExampleClass.build({"bar" => "value"})
 testable.foo #=> "VALUE"
 ```
 
