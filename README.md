@@ -45,8 +45,6 @@ testable = ExampleClass.build({"bar" => "value"})
 testable.foo #=> "value"
 testable = ExampleClass.build({"baz" => "value"}) #=> raises ArgumentError
 ```
-If you want to define your own types, check the Dry Types library. Type needs to respond to `call` method, so 
-you can define your own
 
 ## Type checking
 You can also pass type checks using dry-types library:
