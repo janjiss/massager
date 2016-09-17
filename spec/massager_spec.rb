@@ -90,6 +90,20 @@ describe Massager do
       }.to raise_error(ArgumentError)
     end
 
+    it "raises error if passed arguments don't comply with strict schema" do
+        StrictSchemaError = Class.new do
+          include Massager
+          attribute :foo, "bar","baz", type: Types::Strict::String, strict: true do |bar, baz|
+            bar + baz
+          end
+          attribute :hello, "world", type: Types::Strict::String, strict: true
+        end
+
+      expect {
+        StrictSchemaError.build({"bar" => "bar", "foo" => "foo"})
+      }.to raise_error(ArgumentError, "Missing keys: [\"baz\", \"world\"]")
+    end
+
   end
 
   context "Enum attributes" do
