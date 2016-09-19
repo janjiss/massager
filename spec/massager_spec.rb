@@ -120,5 +120,22 @@ describe Massager do
       expect(testable.regular).to eq("regular")
       expect(testable.with_multiple).to eq("withmultiple")
     end
+
+    it "works with inherience" do
+      Parent = Class.new do
+        include Massager
+        attribute :parent, "parent", strict: true
+      end
+
+      Child = Class.new(Parent) do
+        attribute :child, "child", strict: true
+      end
+
+      testable = Child.call("child" => "child", "parent" => "parent")
+      expect(testable.child).to eq("child")
+      expect(testable.parent).to eq("parent")
+
+      testable = Parent.call("parent" => "parent")
+    end
   end
 end

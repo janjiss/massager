@@ -28,11 +28,16 @@ module Massager
     def call(attrs)
       check_schema(attrs)
       instance = new
-      _container.each_key.select {|a| a.include?("attributes.")}.each do |k|
-        attribute = resolve(k)
+      puts self.class.to_s
+      _container.keys.select {|a| a.include?("attributes.")}.each do |k|
+        attribute = _container.resolve(k)
         instance.public_send("#{attribute.name}=", attrs) if attribute.match_schema?(attrs)
       end
       instance
+    end
+
+    def _container
+      @container ||= Dry::Container.new
     end
 
     private
@@ -40,7 +45,7 @@ module Massager
     def check_schema(attrs)
       attr_keys = attrs.keys.to_set
       if _container.key?("schema")
-        schema = resolve("schema")
+        schema = _container.resolve("schema")
         attr_keys = attr_keys.find_all {|a| schema.include?(a)}
         raise ArgumentError, "Missing keys: #{(schema - attr_keys).to_a}" unless schema.subset?(attr_keys.to_set)
       end
@@ -48,24 +53,24 @@ module Massager
 
     def add_keys_to_schema(opts, target_keys)
       Dry::Monads::Maybe(opts[:strict]).fmap {
-        unless key?(:schema)
-          register(:schema, Set.new)
+        unless _container.key?(:schema)
+          _container.register(:schema, Set.new)
         end
         target_keys.each do |k|
-          resolve(:schema) << k
+          _container.resolve(:schema) << k
         end
       }
     end
 
     def register_attribute(attribute)
-      namespace(:attributes) do
+      _container.namespace(:attributes) do
         register(attribute.name, attribute)
       end
     end
 
     def define_setter(name)
       define_method "#{name}=", Proc.new {|values|
-        attribute = self.class.resolve("attributes.#{name}")
+        attribute = self.class._container.resolve("attributes.#{name}")
         instance_variable_set(:"@#{name}", attribute.call(values))
       }
     end
@@ -75,10 +80,14 @@ module Massager
         instance_variable_get(:"@#{name}")
       }
     end
+
+    def inherited(subclass)
+      subclass.instance_variable_set(:"@container", Marshal.load(Marshal.dump(_container)))
+    end
   end
+
 
   def self.included(base)
     base.extend(ClassMethods)
-    base.extend(Dry::Container::Mixin)
   end
 end
