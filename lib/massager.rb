@@ -13,7 +13,7 @@ module Massager
       register_attribute(
         Attribute.new(name: name, target_keys: target_keys, opts: opts, block: block)
       )
-      add_to_schema(opts, target_keys)
+      add_keys_to_schema(opts, target_keys)
       define_setter(name)
       define_getter(name)
     end
@@ -22,7 +22,7 @@ module Massager
       register_attribute(
         EnumAttribute.new(name: name, target_keys: target_keys, opts: opts, block: block)
       )
-      add_to_schema(opts, target_keys)
+      add_keys_to_schema(opts, target_keys)
       define_setter(name)
       define_getter(name)
     end
