@@ -4,33 +4,31 @@ require "dry-monads"
 require "dry-container"
 require "set"
 
-require "massager/attributes/attribute"
-require "massager/attributes/enum_attribute"
+require "massager/attributes/attribute_with_single_key"
+require "massager/attributes/attribute_with_multiple_keys"
 
 module Massager
   module ClassMethods
     def attribute(name, *target_keys, **opts, &block)
-      register_attribute(
-        Attribute.new(name: name, target_keys: target_keys, opts: opts, block: block)
-      )
+      case
+      when target_keys.count > 1
+        register_attribute(
+          AttributeWithMultipleKeys.new(name: name, keys: target_keys, opts: opts, block: block)
+        )
+      when target_keys.count == 1
+        register_attribute(
+          AttributeWithSingleKey.new(name: name, key: target_keys.first, opts: opts, block: block)
+        )
+      end
       add_keys_to_schema(opts, target_keys)
       define_setter(name)
       define_getter(name)
     end
 
-    def enum_attribute(name, *target_keys, **opts, &block)
-      register_attribute(
-        EnumAttribute.new(name: name, target_keys: target_keys, opts: opts, block: block)
-      )
-      add_keys_to_schema(opts, target_keys)
-      define_setter(name)
-      define_getter(name)
-    end
-
-    def build(attrs)
+    def call(attrs)
       check_schema(attrs)
       instance = new
-      each_key do |k|
+      _container.each_key.select {|a| a.include?("attributes.")}.each do |k|
         attribute = resolve(k)
         instance.public_send("#{attribute.name}=", attrs) if attribute.match_schema?(attrs)
       end
@@ -41,9 +39,10 @@ module Massager
 
     def check_schema(attrs)
       attr_keys = attrs.keys.to_set
-      if key?(:schema)
-        schema = resolve(:schema)
-        raise ArgumentError, "Missing keys: #{(schema - attr_keys).to_a}" unless schema.superset?(attr_keys) 
+      if _container.key?("schema")
+        schema = resolve("schema")
+        attr_keys = attr_keys.find_all {|a| schema.include?(a)}
+        raise ArgumentError, "Missing keys: #{(schema - attr_keys).to_a}" unless schema.subset?(attr_keys.to_set)
       end
     end
 
