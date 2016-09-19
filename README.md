@@ -58,8 +58,7 @@ It will raise an error if the type is not correct:
 ```ruby
 testable = ExampleClass.call({"bar" => "value"})
 testable.foo #=> "value"
-testable = ExampleClass.call({"bar" => 123})
-testable.foo #=> raises Dry::Types::ConstraintError
+testable = ExampleClass.call({"bar" => 123})  #=> raises Dry::Types::ConstraintError
 ```
 If you want to define your own types, check the Dry Types library. Type needs to respond to `call` method, so 
 you can define your own
