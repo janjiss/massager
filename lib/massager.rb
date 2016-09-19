@@ -28,7 +28,6 @@ module Massager
     def call(attrs)
       check_schema(attrs)
       instance = new
-      puts self.class.to_s
       _container.keys.select {|a| a.include?("attributes.")}.each do |k|
         attribute = _container.resolve(k)
         instance.public_send("#{attribute.name}=", attrs) if attribute.match_schema?(attrs)
@@ -82,7 +81,11 @@ module Massager
     end
 
     def inherited(subclass)
-      subclass.instance_variable_set(:"@container", Marshal.load(Marshal.dump(_container)))
+      subclass_container = Dry::Container.new
+      _container.each_key do |k|
+        subclass_container.register(k, _container.resolve(k).clone)
+      end
+      subclass.instance_variable_set(:"@container", subclass_container)
     end
   end
 
