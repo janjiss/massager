@@ -82,7 +82,7 @@ module Massager
 
     def inherited(subclass)
       subclass_container = Dry::Container.new
-      _container.each_key do |k|
+      _container.keys.each do |k|
         subclass_container.register(k, _container.resolve(k).clone)
       end
       subclass.instance_variable_set(:"@container", subclass_container)
