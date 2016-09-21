@@ -4,10 +4,27 @@ require "dry-monads"
 require "dry-container"
 require "set"
 
+require "massager/errors/constraint_error"
 require "massager/attributes/attribute_with_single_key"
 require "massager/attributes/attribute_with_multiple_keys"
+require "massager/hashify"
 
 module Massager
+  module InstanceMethods
+    def [](name)
+      public_send(name)
+    end
+
+    def to_hash
+      self.class._container.keys.select {|a| a.include?("attributes.")}.each_with_object({}) do |key, result|
+        attribute_name = key.gsub("attributes.", "").to_sym
+        result[attribute_name] = Hashify[self[attribute_name]]
+      end
+    end
+
+    alias_method :to_h, :to_hash
+  end
+
   module ClassMethods
     def attribute(name, *target_keys, **opts, &block)
       case
@@ -92,5 +109,6 @@ module Massager
 
   def self.included(base)
     base.extend(ClassMethods)
+    base.include(InstanceMethods)
   end
 end

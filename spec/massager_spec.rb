@@ -43,7 +43,7 @@ describe Massager do
       end
       testable = WithTypes.call({"bar" => "value"})
       expect(testable.foo).to eq("value")
-      expect {WithTypes.call({"bar" => 123})}.to raise_error(Dry::Types::ConstraintError)
+      expect {WithTypes.call({"bar" => 123})}.to raise_error(Massager::ConstraintError)
     end
 
     it "does the typechecking after the block has been executed" do
@@ -78,7 +78,7 @@ describe Massager do
       expect {
         ErrorMultipleArgs.call({"bar" => "bar", "baz" => "baz"})
         testable.foo
-      }.to raise_error(ArgumentError)
+      }.to raise_error(Massager::ConstraintError)
     end
 
     it "raises error if there are multiple attributes and no modifier block" do
@@ -136,6 +136,20 @@ describe Massager do
       expect(testable.parent).to eq("parent")
 
       testable = Parent.call("parent" => "parent")
+    end
+
+    it "transforms struct in to the hash" do
+      Hashified = Class.new do
+        include Massager
+        attribute :first_key, "first_key", strict: true
+        attribute :second_key, "second_key", strict: true
+        attribute :third_key, "third_key", strict: true
+      end
+
+      testable = Hashified.call("first_key" => 1, "second_key" => 2, "third_key" => 3)
+      expect(testable.to_h).to eq({
+        :first_key => 1, :second_key => 2, :third_key => 3
+      })
     end
   end
 end

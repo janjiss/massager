@@ -8,7 +8,13 @@ module Massager
     def call(values)
       values = values.values_at(*keys)
       values = block.call(*values)
-      Dry::Monads::Maybe(opts[:type]).fmap {|type| values = type.call(*values)}
+      Dry::Monads::Maybe(opts[:type]).fmap {|type|
+        begin
+          value = type.call(values)
+        rescue Dry::Types::ConstraintError
+          raise Massager::ConstraintError, "Attribute #{name} did not pass the constraint for value of #{values.inspect}"
+        end
+      }
       values
     end
 
