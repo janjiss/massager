@@ -1,5 +1,8 @@
 # Massager
-
+[![Build Status](https://travis-ci.org/janjiss/massager.svg?branch=master)](https://travis-ci.org/janjiss/massager)
+[![Gem Version](https://badge.fury.io/rb/massager.svg)](https://badge.fury.io/rb/massager)
+[![Dependency Status](https://gemnasium.com/badges/github.com/janjiss/massager.svg)](https://gemnasium.com/github.com/janjiss/massager)
+[![Code Climate](https://codeclimate.com/github/janjiss/massager/badges/gpa.svg)](https://codeclimate.com/github/janjiss/massager)
 Have you ever felt a need to massage your data just a little bit before working with it? This is what Massager was built for.
 
 ## Installation
